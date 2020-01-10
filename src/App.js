@@ -2,7 +2,9 @@ import React from 'react';
 import './App.css';
 import champs from './ChampDate.js'
 import ChampCard from './ChampCard'
-
+import yummi from './imgs/yummi.gif'
+import teemo from './imgs/teemo.gif'
+import zoe from './imgs/zoe.gif'
 
 class App extends React.Component {
   constructor() {
@@ -16,7 +18,9 @@ class App extends React.Component {
       percentage: 0,
       quality: null,
       total: null,
-      region: 'na1'
+      region: 'na1',
+      APIkey: 'RGAPI-26237412-8db4-4e9f-8563-4a52901e4693',
+      champName: null
     }
   }
 
@@ -43,10 +47,10 @@ componentDidMount() {
 let myHeaders = new Headers();
 myHeaders.append("Accept", "*/*");
 myHeaders.append("Cache-Control", "no-cache");
-myHeaders.append("Host", "na1.api.riotgames.com");
+myHeaders.append("Host", `na1.api.riotgames.com`);
 myHeaders.append("Accept-Encoding", "gzip, deflate");
 myHeaders.append("Connection", "keep-alive");
-myHeaders.append("X-Riot-Token", "RGAPI-adc62aa6-0347-4f3e-b770-5cd08ed26794");
+myHeaders.append("X-Riot-Token", `${this.state.APIkey}`);
 
 const requestOptions = {
   method: 'GET',
@@ -54,7 +58,7 @@ const requestOptions = {
   redirect: 'follow'
 };
 
-fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${this.state.name}?api_key=RGAPI-adc62aa6-0347-4f3e-b770-5cd08ed26794`, requestOptions)
+fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${this.state.name}?api_key=${this.state.APIkey}`, requestOptions)
   .then(response => response.json())
   .then(data => this.setState({id: data.id, accountId: data.accountId, puuid: data.puuid}))
   .catch(error => console.log('error', error));
@@ -62,14 +66,15 @@ fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/sum
 
   }
 
-  fetchAmIBad = async (champId) => {
+  fetchAmIBad = (champId, name) => {
+    this.setState({champName: name})
     let myHeaders = new Headers();
     myHeaders.append("Accept", "*/*");
     myHeaders.append("Cache-Control", "no-cache");
-    myHeaders.append("Host", "na1.api.riotgames.com");
+    myHeaders.append("Host", `${this.state.region}.api.riotgames.com`);
     myHeaders.append("Accept-Encoding", "gzip, deflate");
     myHeaders.append("Connection", "keep-alive");
-    myHeaders.append("X-Riot-Token", "RGAPI-adc62aa6-0347-4f3e-b770-5cd08ed26794");
+    myHeaders.append("X-Riot-Token", `${this.state.APIkey}`);
 
     const requestOptions = {
       method: 'GET',
@@ -79,19 +84,19 @@ fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/sum
 
     let badnessIndicator = 0
 
-    fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/${this.state.accountId}?champion=${champId}&api_key=RGAPI-adc62aa6-0347-4f3e-b770-5cd08ed26794`, requestOptions)
+    fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riotgames.com/lol/match/v4/matchlists/by-account/${this.state.accountId}?champion=${champId}&api_key=${this.state.APIkey}`, requestOptions)
       .then(response => response.json())
       .then(data => {
         this.setState({total: data.matches.length})
         data.matches.forEach(match => {
-          setTimeout(() => {
-          fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/match/v4/matches/${match.gameId}?api_key=RGAPI-adc62aa6-0347-4f3e-b770-5cd08ed26794`, requestOptions)
+          setTimeout(( ) => {
+          fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riotgames.com/lol/match/v4/matches/${match.gameId}?api_key=${this.state.APIkey}`, requestOptions)
         .then(response => response.json())
         .then(matchData => {
           const currentUser = matchData.participantIdentities.find(participant => {
           return participant.player.accountId === this.state.accountId
           })
-          console.log(currentUser.participantId <= 5 && matchData.teams[0].win === 'Win');
+
           if (currentUser.participantId <= 5 && matchData.teams[0].win === 'Win') {
             badnessIndicator+=1
             this.setState({percentage:badnessIndicator/this.state.total});
@@ -107,37 +112,29 @@ fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/sum
       },200)
       })
     }).then(this.qualityCalculator)
-    .catch(error => console.log('error', error));
+    .catch(error => this.setState({quality: 'noob', percentage: 0}));
   }
 
    qualityCalculator = () => {
-    if (parseInt(this.state.percentage * 100) <= 50) {        this.setState({quality: 'BELOW AVERAGE'})
-    }
-
-    if (parseInt(this.state.percentage * 100) <= 40) {        this.setState({quality: 'BAD'})
-    }
-
-    if (parseInt(this.state.percentage * 100) <= 30) {        this.setState({quality: 'VERY BAD'})
-    }
-
-    if (parseInt(this.state.percentage * 100) >= 50) {        this.setState({quality: 'GOOD'})
-    }
-    console.log(parseInt(this.state.percentage * 100));
-    if (parseInt(this.state.percentage * 100) >= 60) {        this.setState({quality: 'GREAT'})
-    }
-
-    if (parseInt(this.state.percentage * 100) >= 70) {        this.setState({quality: 'GOD'})
-    }
+    if (parseInt(this.state.percentage * 100) < 50) {this.setState({quality: 'Below Average'})}
+    if (parseInt(this.state.percentage * 100) === 50) {this.setState({quality: 'Average'})}
+    if (parseInt(this.state.percentage * 100) <= 40) {this.setState({quality: 'Bad'})}
+    if (parseInt(this.state.percentage * 100) <= 30) {this.setState({quality: 'Very Bad'})}
+    if (parseInt(this.state.percentage * 100) > 50) {this.setState({quality: 'Good'})}
+    if (parseInt(this.state.percentage * 100) >= 60) {this.setState({quality: 'Great'})}
+    if (parseInt(this.state.percentage * 100) >= 70) {this.setState({quality: 'God'})}
   }
 
   render() {
   return (
     <main className="App">
     <section className="summoner-name">
-    {this.state.quality}
-    {parseInt(this.state.percentage * 100)}%
+    <span>{this.state.name}</span>
+    <span>{this.state.champName}</span>
+    <span>{this.state.quality}</span>
+    <span>{parseInt(this.state.percentage * 100)}%</span>
     <input type="text" onChange={(event) => {this.setState({name: event.target.value})}} placeholder="SUMMONER NAME" className="text-center"/>
-    <select>
+    <select onChange={(event) => this.setState({region: event.target.value})}>
       <option value="na1">NA</option>
       <option value="ru">RU</option>
       <option value="kr">KR</option>
@@ -152,9 +149,7 @@ fetch(`https://cors-anywhere.herokuapp.com/https://na1.api.riotgames.com/lol/sum
     </select>
     <button onClick={this.fetchSummonerInfo}>SUBMIT</button>
     </section>
-    <section className="champs">
-    {this.state.cards}
-    </section>
+    {this.state.id ? <section className="champs">{this.state.cards}</section>:<section className="submit-name"><h1>SUMBIT YOUR SUMMONER NAME</h1><img alt='yummi' src={yummi}/><img alt='teemo' src={teemo}/><img alt='zoe' src={zoe}/></section>}
     </main>
   );
 }
