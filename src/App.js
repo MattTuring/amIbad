@@ -5,6 +5,8 @@ import ChampCard from './ChampCard'
 import yummi from './imgs/yummi.gif'
 import teemo from './imgs/teemo.gif'
 import zoe from './imgs/zoe.gif'
+import heart from './imgs/heart.svg'
+import heartSelected from './imgs/heartSelected.svg'
 
 class App extends React.Component {
   constructor() {
@@ -20,7 +22,8 @@ class App extends React.Component {
       total: null,
       region: 'na1',
       APIkey: 'RGAPI-26237412-8db4-4e9f-8563-4a52901e4693',
-      champName: null
+      champName: null,
+      color: 'grey'
     }
   }
 
@@ -116,23 +119,23 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
   }
 
    qualityCalculator = () => {
-    if (parseInt(this.state.percentage * 100) < 50) {this.setState({quality: 'Below Average'})}
-    if (parseInt(this.state.percentage * 100) === 50) {this.setState({quality: 'Average'})}
-    if (parseInt(this.state.percentage * 100) <= 40) {this.setState({quality: 'Bad'})}
-    if (parseInt(this.state.percentage * 100) <= 30) {this.setState({quality: 'Very Bad'})}
-    if (parseInt(this.state.percentage * 100) > 50) {this.setState({quality: 'Good'})}
-    if (parseInt(this.state.percentage * 100) >= 60) {this.setState({quality: 'Great'})}
-    if (parseInt(this.state.percentage * 100) >= 70) {this.setState({quality: 'God'})}
+    if (parseInt(this.state.percentage * 100) < 50) {this.setState({quality: 'Below Average', color: '#ffd400' })}
+    if (parseInt(this.state.percentage * 100) === 50) {this.setState({quality: 'Average', color: '#76f580'})}
+    if (parseInt(this.state.percentage * 100) <= 40) {this.setState({quality: 'Bad', color: '#ff0000'})}
+    if (parseInt(this.state.percentage * 100) <= 30) {this.setState({quality: 'Very Bad', color:'#6b0000'})}
+    if (parseInt(this.state.percentage * 100) > 50) {this.setState({quality: 'Good', color:'#0bb300'})}
+    if (parseInt(this.state.percentage * 100) >= 60) {this.setState({quality: 'Great', color: '#005613'})}
+    if (parseInt(this.state.percentage * 100) >= 70) {this.setState({quality: 'Godlike', color:'#be83ff'})}
   }
 
   render() {
   return (
     <main className="App">
-    <section className="summoner-name">
-    <span>{this.state.name}</span>
-    <span>{this.state.champName}</span>
+    <section className="summoner-name" style={{backgroundColor: this.state.color}}>
+    {this.state.champName && <><span>{this.state.champName}</span>
     <span>{this.state.quality}</span>
-    <span>{parseInt(this.state.percentage * 100)}%</span>
+    <span>{parseInt(this.state.percentage * 100)}%</span> </>}
+    {this.state.id &&<span><img src={heart} className='favorite' alt="favorite"/>{this.state.name}</span>}
     <input type="text" onChange={(event) => {this.setState({name: event.target.value})}} placeholder="SUMMONER NAME" className="text-center"/>
     <select onChange={(event) => this.setState({region: event.target.value})}>
       <option value="na1">NA</option>

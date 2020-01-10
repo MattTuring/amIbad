@@ -53,9 +53,10 @@ html {
   position: fixed;
   background-color: grey;
   padding-bottom: 10px;
+  padding-top: 10px;
   box-shadow: 2px 3px 8px black;
   top: 0;
-  z-index: 10; 
+  z-index: 10;
 }
 
 .summoner-name>span {
@@ -127,4 +128,8 @@ html {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+}
+
+.favorite {
+  width: 50px;
 }
