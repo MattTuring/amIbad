@@ -1,10 +1,4 @@
-
-export const addMovies = summoner => ({
- type: 'ADD_FAVORITE_SUMMONER',
- summoner
-});
-
-export const addRatings = champ => ({
+export const addChamp = champ => ({
  type: 'ADD_FAVORITE_CHAMP',
  champ
 });

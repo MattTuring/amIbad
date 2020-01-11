@@ -133,3 +133,9 @@ html {
 .favorite {
   width: 50px;
 }
+
+.favorite:hover {
+  cursor: pointer;
+  border-radius: 100px;
+  background-color: pink;
+}

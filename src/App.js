@@ -7,6 +7,11 @@ import teemo from './imgs/teemo.gif'
 import zoe from './imgs/zoe.gif'
 import heart from './imgs/heart.svg'
 import heartSelected from './imgs/heartSelected.svg'
+import { addChamp } from './actions'
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import gear from './imgs/gear.svg'
+import { Link, Route } from 'react-router-dom'
 
 class App extends React.Component {
   constructor() {
@@ -21,7 +26,7 @@ class App extends React.Component {
       quality: null,
       total: null,
       region: 'na1',
-      APIkey: 'RGAPI-26237412-8db4-4e9f-8563-4a52901e4693',
+      APIkey: 'RGAPI-0b7d015f-487b-4665-8b4a-3afff70f472d',
       champName: null,
       color: 'grey'
     }
@@ -39,6 +44,8 @@ componentDidMount() {
       champId={champ.key}
       key={champ.key}
       amIBad={this.fetchAmIBad}
+      addChampToProps={this.addChampToProps}
+      heart={heart}
     />
   })
 
@@ -65,8 +72,6 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
   .then(response => response.json())
   .then(data => this.setState({id: data.id, accountId: data.accountId, puuid: data.puuid}))
   .catch(error => console.log('error', error));
-
-
   }
 
   fetchAmIBad = (champId, name) => {
@@ -115,7 +120,7 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
       },200)
       })
     }).then(this.qualityCalculator)
-    .catch(error => this.setState({quality: 'noob', percentage: 0}));
+    .catch(error => this.setState({quality: 'noob', percentage: 0, color:'grey'}));
   }
 
    qualityCalculator = () => {
@@ -128,34 +133,113 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
     if (parseInt(this.state.percentage * 100) >= 70) {this.setState({quality: 'Godlike', color:'#be83ff'})}
   }
 
+  addChampToProps = (name, champId, image) => {
+    this.props.addChamp(
+      <ChampCard
+      name={name}
+      image={image}
+      champId={champId}
+      key={'unique'+champId}
+      amIBad={this.fetchAmIBad}
+      heart={heartSelected}
+    />)
+  }
+
   render() {
   return (
     <main className="App">
-    <section className="summoner-name" style={{backgroundColor: this.state.color}}>
-    {this.state.champName && <><span>{this.state.champName}</span>
-    <span>{this.state.quality}</span>
-    <span>{parseInt(this.state.percentage * 100)}%</span> </>}
-    {this.state.id &&<span><img src={heart} className='favorite' alt="favorite"/>{this.state.name}</span>}
-    <input type="text" onChange={(event) => {this.setState({name: event.target.value})}} placeholder="SUMMONER NAME" className="text-center"/>
-    <select onChange={(event) => this.setState({region: event.target.value})}>
-      <option value="na1">NA</option>
-      <option value="ru">RU</option>
-      <option value="kr">KR</option>
-      <option value="br1">BR</option>
-      <option value="oc1">OC</option>
-      <option value="jp1">JP1</option>
-      <option value="eun1">EUN</option>
-      <option value="euw1">EUW</option>
-      <option value="tr1">TR</option>
-      <option value="la1">LA1</option>
-      <option value="la2">LA2</option>
-    </select>
-    <button onClick={this.fetchSummonerInfo}>SUBMIT</button>
-    </section>
-    {this.state.id ? <section className="champs">{this.state.cards}</section>:<section className="submit-name"><h1>SUMBIT YOUR SUMMONER NAME</h1><img alt='yummi' src={yummi}/><img alt='teemo' src={teemo}/><img alt='zoe' src={zoe}/></section>}
+
+    <Route
+       exact path="/"
+       render={() => {
+         return (
+           <>
+           <section className="summoner-name" style={{backgroundColor: this.state.color}}>
+             {this.state.champName && <><span>{this.state.champName}</span>
+             <span>{this.state.quality}</span>
+             <span>{parseInt(this.state.percentage * 100)}%</span> </>}
+             {this.state.id &&<span><img src={heart} className='favorite' alt="favorite" onClick={() => {this.props.addSummoner({summoner:this.state.name})}}/>{this.state.name}</span>}
+             <input type="text" onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
+             <select onChange={(event) => this.setState({region: event.target.value})}>
+               <option value="na1">NA</option>
+               <option value="ru">RU</option>
+               <option value="kr">KR</option>
+               <option value="br1">BR</option>
+               <option value="oc1">OC</option>
+               <option value="jp1">JP1</option>
+               <option value="eun1">EUN</option>
+               <option value="euw1">EUW</option>
+               <option value="tr1">TR</option>
+               <option value="la1">LA1</option>
+               <option value="la2">LA2</option>
+           </select>
+           <button onClick={this.fetchSummonerInfo}>SUBMIT</button>
+           <section>
+              <Link to='/favorites'><img src={gear} className="favorite" alt="manage favorites"/></Link>
+           </section>
+           </section>
+           {this.state.id &&
+             <><section className='champs'>
+                 {this.props.favChamps > 0 && <h1>FAVORITE CHAMPIONS</h1>}
+               {this.props.favChamps}
+             </section></>
+           }
+           {this.state.id ? <section className="champs">{this.state.cards}</section>:<section className="submit-name"><h1>SUMBIT YOUR SUMMONER NAME</h1><img alt='yummi' src={yummi}/><img alt='teemo' src={teemo}/><img alt='zoe' src={zoe}/></section>}
+           </>
+         )
+       }}
+     />
+     <Route
+        exact path="/favorites"
+        render={() => {
+          return (
+            <>
+            <section className="summoner-name" style={{backgroundColor: this.state.color}}>
+              {this.state.champName && <><span>{this.state.champName}</span>
+              <span>{this.state.quality}</span>
+              <span>{parseInt(this.state.percentage * 100)}%</span> </>}
+              {this.state.id &&<span><img src={heart} className='favorite' alt="favorite" onClick={() => {this.props.addSummoner({summoner:this.state.name})}}/>{this.state.name}</span>}
+              <input type="text" onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
+              <select onChange={(event) => this.setState({region: event.target.value})}>
+                <option value="na1">NA</option>
+                <option value="ru">RU</option>
+                <option value="kr">KR</option>
+                <option value="br1">BR</option>
+                <option value="oc1">OC</option>
+                <option value="jp1">JP1</option>
+                <option value="eun1">EUN</option>
+                <option value="euw1">EUW</option>
+                <option value="tr1">TR</option>
+                <option value="la1">LA1</option>
+                <option value="la2">LA2</option>
+            </select>
+            <button onClick={this.fetchSummonerInfo}>SUBMIT</button>
+            <section>
+               <Link to='/favorites'><img src={gear} className="favorite" alt="manage favorites"/></Link>
+            </section>
+            </section>
+            {this.state.id &&
+              <><section className='champs'>
+                  {this.props.favChamps > 0 && <h1>FAVORITE CHAMPIONS</h1>}
+                {this.props.favChamps}
+              </section></>
+            }
+            </>
+          )
+        }}
+      />
+
     </main>
   );
 }
 }
 
-export default App;
+export const mapDispatchToProps = dispatch => ({
+  addChamp: champInfo => dispatch(addChamp( champInfo ))
+})
+
+export const mapStateToProps = state => ({
+  favChamps: state.champ,
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App))
