@@ -9,7 +9,8 @@ const ChampCard = ({name, amIBad, champId, image, addChampToProps, heart}) => {
     <div className="middle">
       <div className="text">
       Am I Bad?
-      <img src={heart} onClick={() => addChampToProps(name, champId, image, heart)} className='favorite' alt="favorite"/>
+      {addChampToProps && <img src={heart} onClick={() => addChampToProps(name, champId, image, heart)} className='favorite' alt="favorite"/>}
+      {!addChampToProps && <img src={heart}  className='favorite' alt="favorite"/>}
       </div>
     </div>
     </article>

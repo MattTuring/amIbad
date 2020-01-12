@@ -1,16 +1,17 @@
 import React from 'react';
 import './App.css';
-import champs from './ChampDate.js'
+import champs from './ChampData.js'
 import ChampCard from './ChampCard'
 import yummi from './imgs/yummi.gif'
 import teemo from './imgs/teemo.gif'
 import zoe from './imgs/zoe.gif'
 import heart from './imgs/heart.svg'
 import heartSelected from './imgs/heartSelected.svg'
-import { addChamp } from './actions'
+import { addChamp, addSummoner } from './actions'
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import gear from './imgs/gear.svg'
+import back from './imgs/diagonal-arrow.svg'
 import { Link, Route } from 'react-router-dom'
 
 class App extends React.Component {
@@ -26,7 +27,7 @@ class App extends React.Component {
       quality: null,
       total: null,
       region: 'na1',
-      APIkey: 'RGAPI-0b7d015f-487b-4665-8b4a-3afff70f472d',
+      APIkey: 'RGAPI-6ceadc4c-5120-4708-a843-d9b38a6962af',
       champName: null,
       color: 'grey'
     }
@@ -159,6 +160,11 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
              <span>{this.state.quality}</span>
              <span>{parseInt(this.state.percentage * 100)}%</span> </>}
              {this.state.id &&<span><img src={heart} className='favorite' alt="favorite" onClick={() => {this.props.addSummoner({summoner:this.state.name})}}/>{this.state.name}</span>}
+             {this.props.favSummoner.length > 0 &&   <select onChange={(event) => {this.setState({name: event.target.value}); this.fetchSummonerInfo();}}>
+                 {this.props.favSummoner.map(summoner => {
+                     return <option value={summoner.summoner}>{summoner.summoner}</option>
+                 })}
+             </select>}
              <input type="text" onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
              <select onChange={(event) => this.setState({region: event.target.value})}>
                <option value="na1">NA</option>
@@ -180,7 +186,6 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
            </section>
            {this.state.id &&
              <><section className='champs'>
-                 {this.props.favChamps > 0 && <h1>FAVORITE CHAMPIONS</h1>}
                {this.props.favChamps}
              </section></>
            }
@@ -199,6 +204,11 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
               <span>{this.state.quality}</span>
               <span>{parseInt(this.state.percentage * 100)}%</span> </>}
               {this.state.id &&<span><img src={heart} className='favorite' alt="favorite" onClick={() => {this.props.addSummoner({summoner:this.state.name})}}/>{this.state.name}</span>}
+              {this.props.favSummoner.length > 0 &&   <select onChange={(event) => {this.setState({name: event.target.value}); this.fetchSummonerInfo();}}>
+                  {this.props.favSummoner.map(summoner => {
+                      return <option value={summoner.summoner}>{summoner.summoner}</option>
+                  })}
+              </select>}
               <input type="text" onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
               <select onChange={(event) => this.setState({region: event.target.value})}>
                 <option value="na1">NA</option>
@@ -215,12 +225,11 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
             </select>
             <button onClick={this.fetchSummonerInfo}>SUBMIT</button>
             <section>
-               <Link to='/favorites'><img src={gear} className="favorite" alt="manage favorites"/></Link>
+               <Link to='/'><img src={back} className="favorite" alt="manage favorites"/></Link>
             </section>
             </section>
             {this.state.id &&
               <><section className='champs'>
-                  {this.props.favChamps > 0 && <h1>FAVORITE CHAMPIONS</h1>}
                 {this.props.favChamps}
               </section></>
             }
@@ -235,11 +244,13 @@ fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riot
 }
 
 export const mapDispatchToProps = dispatch => ({
-  addChamp: champInfo => dispatch(addChamp( champInfo ))
+  addChamp: champInfo => dispatch(addChamp( champInfo )),
+  addSummoner: summonerInfo => dispatch(addSummoner( summonerInfo ))
 })
 
 export const mapStateToProps = state => ({
   favChamps: state.champ,
+  favSummoner: state.summoner
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App))
