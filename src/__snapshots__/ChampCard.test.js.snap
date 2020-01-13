@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Form should match the snapshot 1`] = `
+<article
+  className="container"
+  onClick={[Function]}
+>
+  <h4>
+    Aatrox
+  </h4>
+  <img
+    alt="champ"
+    className="champ image"
+    src="string.png"
+  />
+  <div
+    className="middle"
+  >
+    <div
+      className="text"
+    >
+      Am I Bad?
+      <img
+        alt="favorite"
+        className="favorite"
+        onClick={[Function]}
+        src="string.png"
+      />
+    </div>
+  </div>
+</article>
+`;

@@ -14,7 +14,7 @@ import gear from './imgs/gear.svg'
 import back from './imgs/diagonal-arrow.svg'
 import { Link, Route } from 'react-router-dom'
 
-class App extends React.Component {
+export class App extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -53,29 +53,29 @@ componentDidMount() {
   this.setState({cards: cards})
 }
 
-  fetchSummonerInfo = () => {
+fetchSummonerInfo = () => {
 
-let myHeaders = new Headers();
-myHeaders.append("Accept", "*/*");
-myHeaders.append("Cache-Control", "no-cache");
-myHeaders.append("Host", `na1.api.riotgames.com`);
-myHeaders.append("Accept-Encoding", "gzip, deflate");
-myHeaders.append("Connection", "keep-alive");
-myHeaders.append("X-Riot-Token", `${this.state.APIkey}`);
+  let myHeaders = new Headers();
+  myHeaders.append("Accept", "*/*");
+  myHeaders.append("Cache-Control", "no-cache");
+  myHeaders.append("Host", `na1.api.riotgames.com`);
+  myHeaders.append("Accept-Encoding", "gzip, deflate");
+  myHeaders.append("Connection", "keep-alive");
+  myHeaders.append("X-Riot-Token", `${this.state.APIkey}`);
 
-const requestOptions = {
-  method: 'GET',
-  headers: myHeaders,
-  redirect: 'follow'
-};
+  const requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
 
-fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${this.state.name}?api_key=${this.state.APIkey}`, requestOptions)
-  .then(response => response.json())
-  .then(data => this.setState({id: data.id, accountId: data.accountId, puuid: data.puuid}))
-  .catch(error => console.log('error', error));
+  fetch(`https://cors-anywhere.herokuapp.com/https://${this.state.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${this.state.name}?api_key=${this.state.APIkey}`, requestOptions)
+    .then(response => response.json())
+    .then(data => this.setState({id: data.id, accountId: data.accountId, puuid: data.puuid}))
+    .catch(error => console.log('error', error));
   }
 
-  fetchAmIBad = (champId, name) => {
+fetchAmIBad = (champId, name) => {
     this.setState({champName: name})
     let myHeaders = new Headers();
     myHeaders.append("Accept", "*/*");
