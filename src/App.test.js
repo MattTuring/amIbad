@@ -1,9 +1,10 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { App ,mapStateToProps, mapDispatchToProps } from './App';
 import { addChamp, addSummoner } from './actions';
 import { Provider } from "react-redux";
 import configureMockStore from "redux-mock-store";
+import { BrowserRouter as Router } from 'react-router-dom';
 
 
 
@@ -89,7 +90,7 @@ describe('App', () => {
     });
 
     it('qualityCalculator works 4', () => {
-          wrapper.state().percentage = .5
+      wrapper.state().percentage = .5
       wrapper.instance().qualityCalculator()
 
       expect(wrapper.state().quality).toEqual('Average')
@@ -97,7 +98,7 @@ describe('App', () => {
     });
 
     it('qualityCalculator works 5', () => {
-          wrapper.state().percentage = .6
+      wrapper.state().percentage = .6
       wrapper.instance().qualityCalculator()
 
       expect(wrapper.state().quality).toEqual('Great')
@@ -105,11 +106,85 @@ describe('App', () => {
     });
 
     it('qualityCalculator works 6', () => {
-          wrapper.state().percentage = .7
+      wrapper.state().percentage = .7
       wrapper.instance().qualityCalculator()
 
       expect(wrapper.state().quality).toEqual('Godlike')
       expect(wrapper.state().color).toEqual('#be83ff')
     });
+
+    // it('onChange should add value to state', () => {
+    //   const mockDispatch = jest.fn();
+    //   const actionToDispatch = addSummoner([{ sample: 'test' }]);
+    //   const mappedProps = mapDispatchToProps(mockDispatch);
+    //
+    //   mappedProps.addSummoner([{ sample: 'test' }]);
+    //
+    //   console.log(wrapper.props.favSummoner);
+    //   const mockEvent = { target: { value: 'test'} };
+    //   wrapper.find('input').dive('#onChange1').simulate('change', mockEvent);
+    //   expect(wrapper.state().name).toEqual('test')
+    // })
+    //
+    // it('onChange should add value to state', () => {
+    //   const wrapper2 = mount(<Router><App favSummoner={['test']}/></Router>)
+    //   const mockEvent = { target: { value: 'test'} };
+    //   wrapper2.instance().state = {name:''}
+    //   wrapper2.find('#onChange2').simulate('change', mockEvent);
+    //
+    //   expect(wrapper2.instance().state.name).toEqual('test')
+    // })
+
+    it('should fetch',() => {
+
+    const mockResponse = {
+      accountId: "byRQS7fYBBDWjkVFHyPcjqCkOdZoLHnVjNkiYlIFrZVrdfQ",
+      id: "4OEY9z14nQlUZV3JVqorfNe5Hihb49JIsGeaN8MtfCZbA8M",
+      name: "mtats",
+      profileIconId: 2073,
+      puuid: "WAehNrmVWtaT66dhn_j-D3WwNi6t1DBC7HfVcAk3bWPOdfwiSz2yqEkj1ZA3Z4FBsjU8-9tcg-p9lw",
+      revisionDate: 1578537322000,
+      summonerLevel: 170
+    }
+    window.fetch = jest.fn().mockImplementation(() => {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      });
+    });
+      wrapper.state().region = 'na1'
+      wrapper.state().name = 'mtats'
+      wrapper.state().APIkey = 'RGAPI-6ceadc4c-5120-4708-a843-d9b38a6962af'
+      wrapper.instance().fetchSummonerInfo()
+
+      expect(window.fetch).toHaveBeenCalled();
+  });
+
+  it('should fetch amIbad',() => {
+
+  const mockResponse = {
+    accountId: "byRQS7fYBBDWjkVFHyPcjqCkOdZoLHnVjNkiYlIFrZVrdfQ",
+    id: "4OEY9z14nQlUZV3JVqorfNe5Hihb49JIsGeaN8MtfCZbA8M",
+    name: "mtats",
+    profileIconId: 2073,
+    puuid: "WAehNrmVWtaT66dhn_j-D3WwNi6t1DBC7HfVcAk3bWPOdfwiSz2yqEkj1ZA3Z4FBsjU8-9tcg-p9lw",
+    revisionDate: 1578537322000,
+    summonerLevel: 170
+  }
+  window.fetch = jest.fn().mockImplementation(() => {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockResponse)
+    });
+  });
+    wrapper.state().region = 'na1'
+    wrapper.state().name = 'mtats'
+    wrapper.state().APIkey = 'RGAPI-6ceadc4c-5120-4708-a843-d9b38a6962af'
+    wrapper.instance().fetchAmIBad()
+
+    expect(window.fetch).toHaveBeenCalled();
+});
+
+
 
 })

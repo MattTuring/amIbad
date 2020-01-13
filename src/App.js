@@ -15,8 +15,8 @@ import back from './imgs/diagonal-arrow.svg'
 import { Link, Route } from 'react-router-dom'
 
 export class App extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       name: null,
       id: null,
@@ -160,12 +160,12 @@ fetchAmIBad = (champId, name) => {
              <span>{this.state.quality}</span>
              <span>{parseInt(this.state.percentage * 100)}%</span> </>}
              {this.state.id &&<span><img src={heart} className='favorite' alt="favorite" onClick={() => {this.props.addSummoner({summoner:this.state.name})}}/>{this.state.name}</span>}
-             {this.props.favSummoner.length > 0 &&   <select onChange={(event) => {this.setState({name: event.target.value}); this.fetchSummonerInfo();}}>
+             {this.props.favSummoner.length > 0 &&   <select id="onChange1" onChange={(event) => {this.setState({name: event.target.value}); this.fetchSummonerInfo();}}>
                  {this.props.favSummoner.map(summoner => {
                      return <option value={summoner.summoner}>{summoner.summoner}</option>
                  })}
              </select>}
-             <input type="text" onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
+             <input type="text" id='onChange2' onChange={(event) => {this.setState({name: event.target.value}); if(this.state.id) {this.setState({id: null})} }} placeholder="SUMMONER NAME" className="text-center"/>
              <select onChange={(event) => this.setState({region: event.target.value})}>
                <option value="na1">NA</option>
                <option value="ru">RU</option>
